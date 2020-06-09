@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+export APP=appname
+export DOCKER_OPTS=""
+unset GIT_DIR
+
+rm -rf /home/username/apps/$APP
+cd /home/username/apps && \
+git clone /home/username/git/$APP && \
+cd $APP && \
+echo building image && \
+docker build -t $APP .
+if [[ "$?" != "0" ]]; then
+  echo "error while building image."
+  exit 1
+fi
+
+echo "Stopping previous container..."
+docker stop $APP
+
+echo "Starting new container..."
+sleep 1
+docker run -d --name $APP --rm $APP
+
+# Source: https://news.ycombinator.com/item?id=23465591
